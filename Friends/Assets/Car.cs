@@ -6,10 +6,12 @@ public class Car : MonoBehaviour
     public int speed = 40;
     public int rotationSpeed = 40;
 
+    Rigidbody rb;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        rb = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
@@ -21,8 +23,8 @@ public class Car : MonoBehaviour
         translation *= Time.deltaTime;
         rotation *= Time.deltaTime;
         
-        transform.Translate(0,0, translation);
-        transform.Rotate(0, rotation, 0);
+        rb.AddRelativeForce(new Vector3(0,0,translation));
+        rb.AddRelativeTorque(new Vector3(0, rotation, 0));
 
 
     }
