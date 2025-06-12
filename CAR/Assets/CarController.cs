@@ -3,8 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class CarController : MonoBehaviour
 {
+    private Rigidbody rb;
+    private void Start()
+    {
+        rb = GetComponent<Rigidbody>();
+        rb.centerOfMass = new Vector3(0f, -1.0f, 0f);
+    }
     private float horizontalInput, verticalInput;
     private float currentSteerAngle, currentbreakForce;
     private bool isBreaking;
