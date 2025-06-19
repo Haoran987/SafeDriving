@@ -131,6 +131,15 @@ public class PrometeoCarController : MonoBehaviour
       [HideInInspector]
       public bool isTractionLocked; // Used to know whether the traction of the car is locked or not.
 
+      // Custom Variables
+      [Header("Hydroplaning Settings")]
+      public water_etector waterDetector;
+      public float hydroplaningSpeedThreshold = 48f; // Speed threshold for hydroplaning in km/h
+      public float waterDepthThreshold = 0.1f; // Minimum water depth to trigger hydroplaning
+      private bool isHydroplaning = false;
+
+
+
     //PRIVATE VARIABLES
 
       /*
@@ -158,9 +167,19 @@ public class PrometeoCarController : MonoBehaviour
       WheelFrictionCurve RRwheelFriction;
       float RRWextremumSlip;
 
+      // Hydroplaning variables
+      WheelFrictionCurve hydroFriction;
+
     // Start is called before the first frame update
     void Start()
     {
+      hydroFriction = new WheelFrictionCurve();
+      hydroFriction.asymptoteSlip = 4f;
+      hydroFriction.asymptoteValue= 0.05f; 
+      hydroFriction.extremumSlip= 2f; // large slip before grip
+      hydroFriction.extremumValue= 0.1f; // almost no lateral force
+      hydroFriction.stiffness= 0.2f; // drastically reduced grip
+
       //In this part, we set the 'carRigidbody' value with the Rigidbody attached to this
       //gameObject. Also, we define the center of mass of the car with the Vector3 given
       //in the inspector.
@@ -370,6 +389,50 @@ public class PrometeoCarController : MonoBehaviour
       AnimateWheelMeshes();
 
     }
+
+    void FixedUpdate() {
+      // convert carSpeed (km/h) to m/s
+      float carSpeedMS = carSpeed * 1000f / 3600f;
+      bool wantHydroplaning = waterDetector.isInWater
+        && carSpeedMS > (hydroplaningSpeedThreshold * (1000f / 3600f));
+      if (wantHydroplaning && !isHydroplaning) {
+        StartHydroplane();
+      } else if (!wantHydroplaning && isHydroplaning) {
+        StopHydroplane();
+      }
+    }
+
+    void StartHydroplane() {
+      isHydroplaning = true;
+      // swap all 4 wheels to hydro FFs
+      frontLeftCollider .sidewaysFriction = hydroFriction;
+      frontRightCollider.sidewaysFriction = hydroFriction;
+      rearLeftCollider  .sidewaysFriction = hydroFriction;
+      rearRightCollider .sidewaysFriction = hydroFriction;
+      // optionally also reduce forwardFriction similarly:
+      frontLeftCollider .forwardFriction = hydroFriction;
+      frontRightCollider.forwardFriction = hydroFriction;
+      rearLeftCollider  .forwardFriction = hydroFriction;
+      rearRightCollider .forwardFriction = hydroFriction;
+      // trigger a visual/sound effect
+      Debug.Log("🚨 Hydroplaning!");
+    }
+
+    void StopHydroplane() {
+      isHydroplaning = false;
+      // restore original friction curves you cached in Start()
+      frontLeftCollider .sidewaysFriction = FLwheelFriction;
+      frontRightCollider.sidewaysFriction = FRwheelFriction;
+      rearLeftCollider  .sidewaysFriction = RLwheelFriction;
+      rearRightCollider .sidewaysFriction = RRwheelFriction;
+      // likewise restore forwardFriction if you changed it
+      frontLeftCollider .forwardFriction = FLwheelFriction;
+      frontRightCollider.forwardFriction = FRwheelFriction;
+      rearLeftCollider  .forwardFriction = RLwheelFriction;
+      rearRightCollider .forwardFriction = RRwheelFriction;
+      Debug.Log("✔️ Traction recovered.");
+    }
+
 
     // This method converts the car speed data from float to string, and then set the text of the UI carSpeedText with this value.
     public void CarSpeedUI(){
