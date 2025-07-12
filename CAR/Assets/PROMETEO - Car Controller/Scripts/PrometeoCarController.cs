@@ -137,15 +137,43 @@ public class PrometeoCarController : MonoBehaviour
       public float hydroplaningSpeedThreshold = 48f; // Speed threshold for hydroplaning in km/h
       public float waterDepthThreshold = 0.1f; // Minimum water depth to trigger hydroplaning
       private bool isHydroplaning = false;
+      
 
+      [Header("Advanced Hydroplaning Chaos")]
+      public float hydroSpinForce = 1000f; // Random torque for spin
+      public float hydroSteerWiggle = 10f; // Random steer angle
+      private float hydroSpinTimer = 0f; // Timer for applying random forces
+
+
+void ApplyHydroSpin() {
+    Debug.Log("Attempting to add hydroplaning");
+    // Randomize spin force every few frames
+    hydroSpinTimer -= Time.fixedDeltaTime;
+    if (hydroSpinTimer <= 0f) {
+        hydroSpinTimer = UnityEngine.Random.Range(0.4f, 1.2f);
+
+        // Apply unpredictable spin torque
+        float randomTorque = UnityEngine.Random.Range(-hydroSpinForce, hydroSpinForce);
+        carRigidbody.AddTorque(transform.up * randomTorque, ForceMode.Impulse);
+
+        // Apply sudden lateral push to simulate loss of grip
+        float lateralForce = UnityEngine.Random.Range(-500f, 500f);
+        carRigidbody.AddForce(transform.right * lateralForce, ForceMode.Impulse);
+    }
+
+    // Randomly wiggle steering for visual feedback
+    float steerWiggle = UnityEngine.Random.Range(-hydroSteerWiggle, hydroSteerWiggle);
+    frontLeftCollider.steerAngle = steerWiggle;
+    frontRightCollider.steerAngle = steerWiggle;
+}
 
 
     //PRIVATE VARIABLES
 
-      /*
-      IMPORTANT: The following variables should not be modified manually since their values are automatically given via script.
-      */
-      Rigidbody carRigidbody; // Stores the car's rigidbody.
+  /*
+  IMPORTANT: The following variables should not be modified manually since their values are automatically given via script.
+  */
+  Rigidbody carRigidbody; // Stores the car's rigidbody.
       float steeringAxis; // Used to know whether the steering wheel has reached the maximum value. It goes from -1 to 1.
       float throttleAxis; // Used to know whether the throttle has reached the maximum value. It goes from -1 to 1.
       float driftingAxis;
@@ -391,16 +419,23 @@ public class PrometeoCarController : MonoBehaviour
 
     }
 
-    void FixedUpdate() {
-      // convert carSpeed (km/h) to m/s
-      float carSpeedMS = carSpeed * 1000f / 3600f;
-      bool wantHydroplaning = waterDetector.isInWater
-        && carSpeedMS > (hydroplaningSpeedThreshold * (1000f / 3600f));
-      if (wantHydroplaning && !isHydroplaning) {
-        StartHydroplane();
-      } else if (!wantHydroplaning && isHydroplaning) {
-        StopHydroplane();
-      }
+  void FixedUpdate()
+  {
+    // convert carSpeed (km/h) to m/s
+    float carSpeedMS = carSpeed * 1000f / 3600f;
+    bool wantHydroplaning = waterDetector.isInWater
+      && carSpeedMS > (hydroplaningSpeedThreshold * (1000f / 3600f));
+    if (wantHydroplaning && !isHydroplaning)
+    {
+      StartHydroplane();
+    }
+    else if (!wantHydroplaning && isHydroplaning)
+    {
+      StopHydroplane();
+    }
+    if (isHydroplaning) {
+        ApplyHydroSpin();
+    }
     }
 
     void StartHydroplane() {
@@ -419,19 +454,23 @@ public class PrometeoCarController : MonoBehaviour
       Debug.Log("🚨 Hydroplaning!");
     }
 
-    void StopHydroplane() {
-      isHydroplaning = false;
-      // restore original friction curves you cached in Start()
-      frontLeftCollider .sidewaysFriction = FLwheelFriction;
-      frontRightCollider.sidewaysFriction = FRwheelFriction;
-      rearLeftCollider  .sidewaysFriction = RLwheelFriction;
-      rearRightCollider .sidewaysFriction = RRwheelFriction;
-      // likewise restore forwardFriction if you changed it
-      frontLeftCollider .forwardFriction = FLwheelFriction;
-      frontRightCollider.forwardFriction = FRwheelFriction;
-      rearLeftCollider  .forwardFriction = RLwheelFriction;
-      rearRightCollider .forwardFriction = RRwheelFriction;
-      Debug.Log("✔️ Traction recovered.");
+  void StopHydroplane()
+  {
+    isHydroplaning = false;
+    // restore original friction curves you cached in Start()
+    frontLeftCollider.sidewaysFriction = FLwheelFriction;
+    frontRightCollider.sidewaysFriction = FRwheelFriction;
+    rearLeftCollider.sidewaysFriction = RLwheelFriction;
+    rearRightCollider.sidewaysFriction = RRwheelFriction;
+    // likewise restore forwardFriction if you changed it
+    frontLeftCollider.forwardFriction = FLwheelFriction;
+    frontRightCollider.forwardFriction = FRwheelFriction;
+    rearLeftCollider.forwardFriction = RLwheelFriction;
+    rearRightCollider.forwardFriction = RRwheelFriction;
+    Debug.Log("✔️ Traction recovered.");
+    steeringAxis = 0f;
+ResetSteeringAngle();
+
     }
 
 
