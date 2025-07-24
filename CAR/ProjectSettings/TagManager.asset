@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - Water
+  - TirePop
   layers:
   - Default
   - TransparentFX
