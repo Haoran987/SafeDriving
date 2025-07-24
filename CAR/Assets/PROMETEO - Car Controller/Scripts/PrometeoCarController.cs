@@ -488,28 +488,36 @@ void RestoreTireFriction(WheelCollider wheel) {
 
     WheelCollider poppedWheel = null;
 
-    void OnTriggerEnter(Collider other)
+  void OnTriggerEnter(Collider other)
+  {
+    if (other.CompareTag("TirePop"))
     {
-      if (other.CompareTag("TirePop")) {
-        // pick a random tire to pop
-        WheelCollider[] wheels = { frontLeftCollider, frontRightCollider, rearLeftCollider, rearRightCollider };
-        int randomIndex = UnityEngine.Random.Range(0, wheels.Length);
-        poppedWheel = wheels[randomIndex];
-        Debug.Log("Popping tire: " + poppedWheel.gameObject.name);
-        ApplyTirePop(poppedWheel);
-        // Apply intentional turn to further mess with traction
-        if (randomIndex < 2) {
-          // front tires
-          float steerWiggle = UnityEngine.Random.Range(-10f, 10f);
-          frontLeftCollider.steerAngle = steerWiggle;
-          frontRightCollider.steerAngle = steerWiggle;
-        } else {
-          // rear tires
-          float steerWiggle = UnityEngine.Random.Range(-5f, 5f);
-          rearLeftCollider.steerAngle = steerWiggle;
-          rearRightCollider.steerAngle = steerWiggle;
-        }
+      // pick a random tire to pop
+      WheelCollider[] wheels = { frontLeftCollider, frontRightCollider, rearLeftCollider, rearRightCollider };
+      int randomIndex = UnityEngine.Random.Range(0, wheels.Length);
+      poppedWheel = wheels[randomIndex];
+      Debug.Log("Popping tire: " + poppedWheel.gameObject.name);
+      ApplyTirePop(poppedWheel);
+      // Apply intentional turn to further mess with traction
+      if (randomIndex < 2)
+      {
+        // front tires
+        float steerWiggle = UnityEngine.Random.Range(-10f, 10f);
+        frontLeftCollider.steerAngle = steerWiggle;
+        frontRightCollider.steerAngle = steerWiggle;
       }
+      else
+      {
+        // rear tires
+        float steerWiggle = UnityEngine.Random.Range(-5f, 5f);
+        rearLeftCollider.steerAngle = steerWiggle;
+        rearRightCollider.steerAngle = steerWiggle;
+      }
+    }
+    else if (other.CompareTag("Death"))
+    {
+      Debug.Log("DEAD");
+    }
     }
 
     void OnTriggerExit(Collider other)
