@@ -490,7 +490,7 @@ void RestoreTireFriction(WheelCollider wheel) {
 
   void OnTriggerEnter(Collider other)
   {
-    if (other.CompareTag("TirePop"))
+    if (other.CompareTag("TirePop") && this.tag != "NPC")
     {
       // pick a random tire to pop
       WheelCollider[] wheels = { frontLeftCollider, frontRightCollider, rearLeftCollider, rearRightCollider };
