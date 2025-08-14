@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class PrometeoNPC : MonoBehaviour
 {
+    public float initialSpeed = 50f;
     public float speed = 50f; // km/h
     public WheelCollider frontLeftCollider;
     public WheelCollider frontRightCollider;
@@ -13,6 +14,7 @@ public class PrometeoNPC : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        rb.linearVelocity = new Vector3(-initialSpeed, 0f, 0f);
     }
 
     void FixedUpdate()
