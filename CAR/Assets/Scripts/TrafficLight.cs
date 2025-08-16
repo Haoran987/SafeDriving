@@ -20,7 +20,10 @@ public class TrafficLight : MonoBehaviour
     public LightState BottomLightState { get; private set; }
 
     public bool autoUpdate = true;
-    public float updateInterval = 10.0f; 
+    public float redLifetime = 30.0f;
+    public float yellowLifetime = 10.0f;
+    public float greenLifetime = 20.0f;
+    private float updateInterval = 10.0f; 
     public LightState initialTopLightState = LightState.Red;
     public LightState initialBottomLightState = LightState.Red;
 
@@ -28,6 +31,18 @@ public class TrafficLight : MonoBehaviour
     {
         TopLightState = state;
         UpdateLightMaterials(0, state);
+        switch (state)
+        {
+            case LightState.Red:
+                updateInterval = redLifetime;
+                break;
+            case LightState.Yellow:
+                updateInterval = yellowLifetime;
+                break;
+            case LightState.Green:
+                updateInterval = greenLifetime;
+                break;
+        }
     }
 
     public void SetBottomLightState(LightState state)
@@ -52,17 +67,20 @@ public class TrafficLight : MonoBehaviour
         if (TopLightState == LightState.Red)
         {
             SetTopLightState(LightState.Green);
-            SetBottomLightState(LightState.Red);
+            SetBottomLightState(LightState.Green);
+            updateInterval = greenLifetime;
         }
         else if (TopLightState == LightState.Green)
         {
             SetTopLightState(LightState.Yellow);
-            SetBottomLightState(LightState.Green);
+            SetBottomLightState(LightState.Yellow);
+            updateInterval = yellowLifetime; // shorter yellow light
         }
         else if (TopLightState == LightState.Yellow)
         {
             SetTopLightState(LightState.Red);
-            SetBottomLightState(LightState.Yellow);
+            SetBottomLightState(LightState.Red);
+            updateInterval = redLifetime; // longer red light
         }
     }
 
@@ -80,7 +98,7 @@ public class TrafficLight : MonoBehaviour
         if (updateInterval <= 0f)
         {
             CycleLights();
-            updateInterval = 10.0f;
+            // updateInterval = 10.0f;
         }
     }
 }

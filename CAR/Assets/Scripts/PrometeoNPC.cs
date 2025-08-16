@@ -2,6 +2,13 @@ using UnityEngine;
 
 public class PrometeoNPC : MonoBehaviour
 {
+    public enum NPCType
+    {
+        Continuous,
+        StopAndGo
+    }
+    public NPCType npcType = NPCType.Continuous;
+
     public float initialSpeed = 50f;
     public float speed = 50f; // km/h
     public WheelCollider frontLeftCollider;
@@ -15,19 +22,34 @@ public class PrometeoNPC : MonoBehaviour
     private bool npcStarted = false;
     private float moveTimer = 0f;
 
+    private bool lookedLeft = false;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        rb.linearVelocity = Vector3.zero; // stay still
-        ApplyMotorTorque(0f);
-        ApplyBrake(10000f); // hold NPC in place with big brakes
+
+        if (npcType == NPCType.StopAndGo) {
+            rb.linearVelocity = Vector3.zero; // stay still
+            ApplyMotorTorque(0f);
+            ApplyBrake(10000f); // hold NPC in place with big brakes
+        } else {
+            npcStarted = true; // start NPC immediately
+        }
+        
+    }
+
+    void Update() {
+        if (Input.GetKeyDown(KeyCode.Alpha1)) {
+            lookedLeft = true;
+            moveTimer = 1.0f;
+        }
     }
 
     void FixedUpdate()
     {
         if (!npcStarted)
         {
-            if (playerCar != null && playerCar.carSpeed > 0.5f) // player moving
+            if ((playerCar != null && playerCar.carSpeed > 0.5f) || lookedLeft) // player moving
             {
                 moveTimer += Time.fixedDeltaTime;
                 if (moveTimer >= 0.75f)
