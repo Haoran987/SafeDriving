@@ -9,29 +9,56 @@ public class PrometeoNPC : MonoBehaviour
     public WheelCollider rearLeftCollider;
     public WheelCollider rearRightCollider;
 
+    public PrometeoCarController playerCar; // reference to the player car
+
     private Rigidbody rb;
+    private bool npcStarted = false;
+    private float moveTimer = 0f;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        rb.linearVelocity = new Vector3(-initialSpeed, 0f, 0f);
+        rb.linearVelocity = Vector3.zero; // stay still
+        ApplyMotorTorque(0f);
+        ApplyBrake(10000f); // hold NPC in place with big brakes
     }
 
     void FixedUpdate()
     {
-        // Convert speed from km/h to m/s
-        float targetSpeedMS = speed * 1000f / 3600f;
+        if (!npcStarted)
+        {
+            if (playerCar != null && playerCar.carSpeed > 0.5f) // player moving
+            {
+                moveTimer += Time.fixedDeltaTime;
+                if (moveTimer >= 0.75f)
+                {
+                    npcStarted = true;
 
-        // Current forward speed in m/s
+                    // release brakes
+                    ApplyBrake(0f);
+
+                    // give initial push
+                    rb.linearVelocity = new Vector3(-initialSpeed * 1000f / 3600f, 0f, 0f);
+                }
+            }
+            else
+            {
+                moveTimer = 0f; // reset if player stops early
+            }
+            return;
+        }
+
+        // NPC driving logic
+        float targetSpeedMS = speed * 1000f / 3600f;
         float currentSpeedMS = rb.linearVelocity.magnitude;
 
         if (currentSpeedMS < targetSpeedMS)
         {
-            ApplyMotorTorque(200f); // Apply forward torque
+            ApplyMotorTorque(200f);
         }
         else
         {
-            ApplyMotorTorque(0f); // Stop accelerating
+            ApplyMotorTorque(0f);
         }
     }
 
@@ -41,5 +68,13 @@ public class PrometeoNPC : MonoBehaviour
         frontRightCollider.motorTorque = torque;
         rearLeftCollider.motorTorque = torque;
         rearRightCollider.motorTorque = torque;
+    }
+
+    void ApplyBrake(float torque)
+    {
+        frontLeftCollider.brakeTorque = torque;
+        frontRightCollider.brakeTorque = torque;
+        rearLeftCollider.brakeTorque = torque;
+        rearRightCollider.brakeTorque = torque;
     }
 }
