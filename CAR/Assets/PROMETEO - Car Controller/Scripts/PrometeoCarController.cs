@@ -145,6 +145,9 @@ public class PrometeoCarController : MonoBehaviour
       private float hydroSpinTimer = 0f; // Timer for applying random forces
 
 
+      private bool isDrivable = true;
+
+
 void ApplyHydroSpin() {
     Debug.Log("Attempting to add hydroplaning");
     // Randomize spin force every few frames
@@ -518,6 +521,10 @@ void RestoreTireFriction(WheelCollider wheel) {
     {
       Debug.Log("DEAD");
     }
+    else if (other.CompareTag("Start_Stop"))
+    {
+      isDrivable = false;
+    }
     }
 
     void OnTriggerExit(Collider other)
@@ -527,6 +534,9 @@ void RestoreTireFriction(WheelCollider wheel) {
         // Debug.Log("Restoring tire friction for: " + poppedWheel.gameObject.name);
         // RestoreTireFriction(poppedWheel);
         // poppedWheel = null; // reset popped wheel
+      } else if (other.CompareTag("Start_Stop"))
+      {
+        isDrivable = true;
       }
     }
 
