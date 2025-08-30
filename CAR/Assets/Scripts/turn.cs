@@ -37,7 +37,7 @@ public class CameraRotate : MonoBehaviour
         yield return new WaitForSeconds(resetDelay);
 
         // Reset rotation to original
-        transform.rotation = originalRotation;
+        transform.localRotation = Quaternion.Euler(Vector3.zero);
 
         isRotating = false;
     }
