@@ -414,6 +414,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 642287924342879162, guid: 79d0ca8b77e301442afdb49f102e8aed, type: 3}
       insertIndex: -1
       addedObject: {fileID: 299028310}
+    - targetCorrespondingSourceObject: {fileID: 642287924342879162, guid: 79d0ca8b77e301442afdb49f102e8aed, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 299028311}
   m_SourcePrefab: {fileID: 100100000, guid: 79d0ca8b77e301442afdb49f102e8aed, type: 3}
 --- !u!1 &299028308 stripped
 GameObject:
@@ -438,6 +441,86 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isInWater: 0
+--- !u!114 &299028311
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 299028308}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2a14a754b55b4f82bc48d7595681960, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  steer:
+    m_UseReference: 1
+    m_Action:
+      m_Name: Steer
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: 20074110-c225-485f-ba5a-9b55cde57631
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings:
+      - m_Name: 
+        m_Id: 3ad602af-63b4-43ea-bf9f-4cf17eed5cc9
+        m_Path: 
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Steer
+        m_Flags: 0
+      m_Flags: 0
+    m_Reference: {fileID: -4690886941972645041, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  throttle:
+    m_UseReference: 1
+    m_Action:
+      m_Name: Throttle
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: 629535bd-6f32-49c0-9c6b-16fca2193de0
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    m_Reference: {fileID: -2066659137049100748, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  brake:
+    m_UseReference: 1
+    m_Action:
+      m_Name: Brake
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: b2846060-8f55-4e19-9443-4c7760e0bbc6
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    m_Reference: {fileID: -2066659137049100748, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  accelerator:
+    m_UseReference: 1
+    m_Action:
+      m_Name: Accelerator
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: fa31cc1b-3724-413f-bdc5-c6b3ea8ba29f
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    m_Reference: {fileID: -8439640964645332224, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  hat:
+    m_UseReference: 1
+    m_Action:
+      m_Name: Hat
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: 1b1118a1-ed13-4f0b-a532-91662b65ed69
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    m_Reference: {fileID: 7779109749521252409, guid: 052faaac586de48259a63d0c4782560b, type: 3}
 --- !u!1001 &312660439
 PrefabInstance:
   m_ObjectHideFlags: 0
