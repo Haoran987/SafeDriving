@@ -1,10 +1,12 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class PoppedTireScenario : MonoBehaviour
 {
     [Header("UI Elements")]
     public GameObject instructionPanel;
+    public GameObject endPanel;
 
     [Header("Scenario Elements")]
     public Transform popTriggerZone;
@@ -36,6 +38,20 @@ public class PoppedTireScenario : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            endPanel.SetActive(true);
+            // Time.timeScale = 0f; // Pause the game
+        }
+    }
+
+    public void RestartScenario()
+    {
+        SceneManager.LoadScene("Popped Tire");
+    }
+
+    public void ExitToScenarioSelect()
+    {
+        SceneManager.LoadScene("Scenario Select");
     }
 }

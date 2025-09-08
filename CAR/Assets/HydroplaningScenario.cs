@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
 
-public class TBoneHandler : MonoBehaviour
+public class HydroplaningScenario : MonoBehaviour
 {
     [Header("UI Elements")]
     public GameObject instructionPanel;
@@ -14,7 +14,7 @@ public class TBoneHandler : MonoBehaviour
     // after 3 seconds, the instruction panel will be hidden
     private float instructionDelay = 3f;
     private float timer = 0f;
-
+    
     IEnumerator PanelSetup()
     {
         // Show the instruction panel at the start
@@ -44,11 +44,12 @@ public class TBoneHandler : MonoBehaviour
 
     public void RestartScenario()
     {
-        SceneManager.LoadScene("T-Bone");
+        SceneManager.LoadScene("Hydroplaning");
     }
 
     public void ExitToScenarioSelect()
     {
+        Debug.Log("Exiting to scenario select");
         SceneManager.LoadScene("Scenario Select");
     }
 }
