@@ -13,9 +13,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 public class PrometeoCarController : MonoBehaviour
 {
+
+    [Header("Assign InputActionProperty (Value/Axes)")]
+    public InputActionProperty steer;     // <Joystick>/stick/x
+    public InputActionProperty throttle;  // <Joystick>/throttle OR split axis
+    public InputActionProperty brake;     // <Joystick>/brake OR split axis
+    public InputActionProperty accelerator; // <Joystick>/accelerator OR split axis (optional)
+    public InputActionProperty hat;       // <Joystick>/hat (optional)
+
+    void OnEnable() {
+        steer.action.Enable();
+        throttle.action.Enable();
+        brake.action.Enable();
+        if (accelerator.reference != null) accelerator.action.Enable();
+        if (hat.reference != null) hat.action.Enable();
+    }
 
     //CAR SETUP
 
@@ -349,6 +365,7 @@ void RestoreTireFriction(WheelCollider wheel) {
     void Update()
     {
 
+
       //CAR DATA
 
       // We determine the speed of the car.
@@ -409,11 +426,25 @@ void RestoreTireFriction(WheelCollider wheel) {
         }
 
       }else{
+        float steerValue = steer.action.ReadValue<float>();
+        float throttleValue = throttle.action.ReadValue<float>();
+        float brakeValue = brake.action.ReadValue<float>();
+        float acceleratorValue = accelerator.action.ReadValue<float>();
 
-        if(Input.GetKey(KeyCode.W)){
+        // Debug.Log($"steer={steerValue:F2}");
+        // Debug.Log($"brake={brakeValue:F2}");
+
+        if(Input.GetKey(KeyCode.W) || acceleratorValue < 1f){
+          // 1 = nothing, -1 = full throttle so we need to change the numbers here
+          // 0.99 to -1 becomes 0.01 to 1
+          float adjustedValue = 1f - ((acceleratorValue + 1f) / 2f);
+          if (adjustedValue < 0.01f) adjustedValue = 0.01f; // minimum throttle
+          if (adjustedValue > 1f) adjustedValue = 1f; // clamp max
+          
           CancelInvoke("DecelerateCar");
           deceleratingCar = false;
-          GoForward();
+          // Debug.Log("Accelerator Value: " + adjustedValue);
+          GoForward(adjustedValue);
         }
         if(Input.GetKey(KeyCode.S)){
           CancelInvoke("DecelerateCar");
@@ -421,12 +452,30 @@ void RestoreTireFriction(WheelCollider wheel) {
           GoReverse();
         }
 
-        if(Input.GetKey(KeyCode.A)){
-          TurnLeft();
+        if (steer != null) {
+            AnalogSteering(steerValue);
+        } else {
+          if(Input.GetKey(KeyCode.A)){
+            TurnLeft();
+          }
+          if(Input.GetKey(KeyCode.D)){
+            TurnRight();
+          }
         }
-        if(Input.GetKey(KeyCode.D)){
-          TurnRight();
-        }
+
+        if (brakeValue < 1f) {
+          float adjustedBrake = 1f - ((brakeValue + 1f) / 2f);
+          if (adjustedBrake < 0.01f) adjustedBrake = 0.01f; // minimum brake
+          if (adjustedBrake > 1f) adjustedBrake = 1f; // clamp max
+          Debug.Log("Brake Value: " + adjustedBrake);
+          Brakes(adjustedBrake);
+        } 
+        // else if (Input.GetKey(KeyCode.S)) {
+        //   Brakes(1f);
+        // } else {
+        //   Brakes(0f);
+        // }
+        
         if(Input.GetKey(KeyCode.Space)){
           CancelInvoke("DecelerateCar");
           deceleratingCar = false;
@@ -435,15 +484,20 @@ void RestoreTireFriction(WheelCollider wheel) {
         if(Input.GetKeyUp(KeyCode.Space)){
           RecoverTraction();
         }
-        if((!Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.W))){
+        if((!Input.GetKey(KeyCode.S) && !(Input.GetKey(KeyCode.W) || acceleratorValue < 1f))){
           ThrottleOff();
         }
-        if((!Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.W)) && !Input.GetKey(KeyCode.Space) && !deceleratingCar){
+        if((!Input.GetKey(KeyCode.S) && !(Input.GetKey(KeyCode.W) || acceleratorValue < 1f)) && !Input.GetKey(KeyCode.Space) && !deceleratingCar){
           InvokeRepeating("DecelerateCar", 0f, 0.1f);
           deceleratingCar = true;
         }
-        if(!Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D) && steeringAxis != 0f){
-          ResetSteeringAngle();
+
+        if (steer != null) {
+            // do nothing, handled in AnalogSteering()
+        } else {
+          if(!Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D) && steeringAxis != 0f){
+            ResetSteeringAngle();
+          }
         }
 
       }
@@ -611,6 +665,16 @@ ResetSteeringAngle();
     //STEERING METHODS
     //
 
+    public void AnalogSteering(float steerValue) {
+      steeringAxis = steerValue;
+      // -1: left, 0: center, 1: right
+      var steeringAngle = steeringAxis * maxSteeringAngle;
+      frontLeftCollider.steerAngle = steeringAngle;
+      frontRightCollider.steerAngle = steeringAngle;
+
+      // Debug.Log($"Steering: {steeringAxis:F2} -> angle {steeringAngle:F1}");
+    }
+
     //The following method turns the front car wheels to the left. The speed of this movement will depend on the steeringSpeed variable.
     public void TurnLeft(){
       steeringAxis = steeringAxis - (Time.deltaTime * 10f * steeringSpeed);
@@ -685,7 +749,8 @@ ResetSteeringAngle();
     //
 
     // This method apply positive torque to the wheels in order to go forward.
-    public void GoForward(){
+    public void GoForward(float analogValue = 1f){
+      Debug.Log("Analog Value: " + analogValue);
       //If the forces aplied to the rigidbody in the 'x' asis are greater than
       //3f, it means that the car is losing traction, then the car will start emitting particle systems.
       if(Mathf.Abs(localVelocityX) > 2.5f){
@@ -707,15 +772,17 @@ ResetSteeringAngle();
         Brakes();
       }else{
         if(Mathf.RoundToInt(carSpeed) < maxSpeed){
+          Debug.Log("Accelerator Value: " + analogValue);
+          Debug.Log($"{(accelerationMultiplier * analogValue * 50f) * throttleAxis}");
           //Apply positive torque in all wheels to go forward if maxSpeed has not been reached.
           frontLeftCollider.brakeTorque = 0;
-          frontLeftCollider.motorTorque = (accelerationMultiplier * 50f) * throttleAxis;
+          frontLeftCollider.motorTorque = (accelerationMultiplier * analogValue * 50f) * throttleAxis;
           frontRightCollider.brakeTorque = 0;
-          frontRightCollider.motorTorque = (accelerationMultiplier * 50f) * throttleAxis;
+          frontRightCollider.motorTorque = (accelerationMultiplier * analogValue * 50f) * throttleAxis;
           rearLeftCollider.brakeTorque = 0;
-          rearLeftCollider.motorTorque = (accelerationMultiplier * 50f) * throttleAxis;
+          rearLeftCollider.motorTorque = (accelerationMultiplier * analogValue * 50f) * throttleAxis;
           rearRightCollider.brakeTorque = 0;
-          rearRightCollider.motorTorque = (accelerationMultiplier * 50f) * throttleAxis;
+          rearRightCollider.motorTorque = (accelerationMultiplier * analogValue * 50f) * throttleAxis;
         }else {
           // If the maxSpeed has been reached, then stop applying torque to the wheels.
           // IMPORTANT: The maxSpeed variable should be considered as an approximation; the speed of the car
@@ -817,11 +884,11 @@ ResetSteeringAngle();
     }
 
     // This function applies brake torque to the wheels according to the brake force given by the user.
-    public void Brakes(){
-      frontLeftCollider.brakeTorque = brakeForce;
-      frontRightCollider.brakeTorque = brakeForce;
-      rearLeftCollider.brakeTorque = brakeForce;
-      rearRightCollider.brakeTorque = brakeForce;
+    public void Brakes(float analogValue = 1f){
+      frontLeftCollider.brakeTorque = brakeForce * analogValue;
+      frontRightCollider.brakeTorque = brakeForce * analogValue;
+      rearLeftCollider.brakeTorque = brakeForce * analogValue;
+      rearRightCollider.brakeTorque = brakeForce * analogValue;
     }
 
     // This function is used to make the car lose traction. By using this, the car will start drifting. The amount of traction lost

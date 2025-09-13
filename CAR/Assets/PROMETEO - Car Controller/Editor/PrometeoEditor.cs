@@ -13,6 +13,17 @@ public class PrometeoEditor : Editor{
   private SerializedObject SO;
   //
   //
+  //CAR INPUTS
+  //
+  //
+  private SerializedProperty steer;
+  private SerializedProperty throttle;
+  private SerializedProperty brake;
+  private SerializedProperty accelerator;
+  private SerializedProperty hat;
+
+  //
+  //
   //CAR SETUP
   //
   //
@@ -79,6 +90,12 @@ public class PrometeoEditor : Editor{
     prometeo = (PrometeoCarController)target;
     SO = new SerializedObject(target);
 
+    steer = SO.FindProperty("steer");
+    throttle = SO.FindProperty("throttle");
+    brake = SO.FindProperty("brake");
+    accelerator = SO.FindProperty("accelerator");
+    hat = SO.FindProperty("hat");
+
     maxSpeed = SO.FindProperty("maxSpeed");
     maxReverseSpeed = SO.FindProperty("maxReverseSpeed");
     accelerationMultiplier = SO.FindProperty("accelerationMultiplier");
@@ -123,6 +140,21 @@ public class PrometeoEditor : Editor{
   public override void OnInspectorGUI(){
 
     SO.Update();
+
+    GUILayout.Space(25);
+    GUILayout.Label("CAR INPUTS", EditorStyles.boldLabel);
+    GUILayout.Space(10);
+    //
+    //
+    //CAR INPUTS
+    //
+    //
+    EditorGUILayout.PropertyField(steer, new GUIContent("Steering Input: "));
+    EditorGUILayout.PropertyField(throttle, new GUIContent("Throttle Input: "));
+    EditorGUILayout.PropertyField(brake, new GUIContent("Brake Input: "));
+    EditorGUILayout.PropertyField(accelerator, new GUIContent("Accelerator Input (optional): "));
+    EditorGUILayout.PropertyField(hat, new GUIContent("Hat Input (optional): "));
+    
 
     GUILayout.Space(25);
     GUILayout.Label("CAR SETUP", EditorStyles.boldLabel);
