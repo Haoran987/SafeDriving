@@ -9,11 +9,15 @@ public class DrivingWheelTest : MonoBehaviour
     public InputActionProperty brake;     // <Joystick>/brake OR split axis
     public InputActionProperty accelerator; // <Joystick>/accelerator OR split axis (optional)
     public InputActionProperty hat;       // <Joystick>/hat (optional)
+    public InputActionProperty leftTrigger; // button6
+    public InputActionProperty rightTrigger; // button5
 
     void OnEnable() {
         steer.action.Enable();
         throttle.action.Enable();
         brake.action.Enable();
+        leftTrigger.action.Enable();
+        rightTrigger.action.Enable();
         if (accelerator.reference != null) accelerator.action.Enable();
         if (hat.reference != null) hat.action.Enable();
     }
@@ -22,6 +26,19 @@ public class DrivingWheelTest : MonoBehaviour
         float s = steer.action.ReadValue<float>();
         float t = throttle.action.ReadValue<float>();
         float b = brake.action.ReadValue<float>();
+        // Some wheels have triggers instead of separate throttle/brake axes
+        if (leftTrigger.reference != null) {
+            float lt = leftTrigger.action.ReadValue<float>();
+            b = Mathf.Max(b, lt);
+            if (lt > 0.01f)
+                Debug.Log($"LeftTrigger={lt:F2}");
+        }
+        if (rightTrigger.reference != null) {
+            float rt = rightTrigger.action.ReadValue<float>();
+            t = Mathf.Max(t, rt);
+            if (rt > 0.01f)
+                Debug.Log($"RightTrigger={rt:F2}");
+        }
         if (accelerator.reference != null) {
             float a = accelerator.action.ReadValue<float>();
             t = Mathf.Max(t, a);

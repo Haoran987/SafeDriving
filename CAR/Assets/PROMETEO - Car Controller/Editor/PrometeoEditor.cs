@@ -21,6 +21,10 @@ public class PrometeoEditor : Editor{
   private SerializedProperty brake;
   private SerializedProperty accelerator;
   private SerializedProperty hat;
+  // private SerializedProperty leftTrigger;
+  // private SerializedProperty rightTrigger;
+  private SerializedProperty driveMode;
+  private SerializedProperty reverseMode;
 
   //
   //
@@ -95,6 +99,10 @@ public class PrometeoEditor : Editor{
     brake = SO.FindProperty("brake");
     accelerator = SO.FindProperty("accelerator");
     hat = SO.FindProperty("hat");
+    // leftTrigger = SO.FindProperty("leftTrigger");
+    // rightTrigger = SO.FindProperty("rightTrigger");
+    driveMode = SO.FindProperty("driveMode");
+    reverseMode = SO.FindProperty("reverseMode");
 
     maxSpeed = SO.FindProperty("maxSpeed");
     maxReverseSpeed = SO.FindProperty("maxReverseSpeed");
@@ -154,7 +162,10 @@ public class PrometeoEditor : Editor{
     EditorGUILayout.PropertyField(brake, new GUIContent("Brake Input: "));
     EditorGUILayout.PropertyField(accelerator, new GUIContent("Accelerator Input (optional): "));
     EditorGUILayout.PropertyField(hat, new GUIContent("Hat Input (optional): "));
-    
+    // EditorGUILayout.PropertyField(leftTrigger, new GUIContent("Left Trigger Input (optional): "));
+    // EditorGUILayout.PropertyField(rightTrigger, new GUIContent("Right Trigger Input (optional): "));
+    EditorGUILayout.PropertyField(driveMode, new GUIContent("Drive Mode Input (optional): "));
+    EditorGUILayout.PropertyField(reverseMode, new GUIContent("Reverse Mode Input (optional): "));
 
     GUILayout.Space(25);
     GUILayout.Label("CAR SETUP", EditorStyles.boldLabel);

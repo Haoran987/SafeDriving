@@ -24,11 +24,17 @@ public class PrometeoCarController : MonoBehaviour
     public InputActionProperty brake;     // <Joystick>/brake OR split axis
     public InputActionProperty accelerator; // <Joystick>/accelerator OR split axis (optional)
     public InputActionProperty hat;       // <Joystick>/hat (optional)
+    public InputActionProperty driveMode;
+    public InputActionProperty reverseMode;
+
+    bool driveModeActive = true;
 
     void OnEnable() {
         steer.action.Enable();
         throttle.action.Enable();
         brake.action.Enable();
+        driveMode.action.Enable();
+        reverseMode.action.Enable();
         if (accelerator.reference != null) accelerator.action.Enable();
         if (hat.reference != null) hat.action.Enable();
     }
@@ -430,9 +436,21 @@ void RestoreTireFriction(WheelCollider wheel) {
         float throttleValue = throttle.action.ReadValue<float>();
         float brakeValue = brake.action.ReadValue<float>();
         float acceleratorValue = accelerator.action.ReadValue<float>();
+        float driveModeValue = driveMode.action.ReadValue<float>();
+        float reverseModeValue = reverseMode.action.ReadValue<float>();
 
         // Debug.Log($"steer={steerValue:F2}");
         // Debug.Log($"brake={brakeValue:F2}");
+
+        float overallVelocity = Mathf.Abs(localVelocityZ) + Mathf.Abs(localVelocityX);
+
+        if (driveModeValue == 1f && overallVelocity < 0.1f) {
+          driveModeActive = true;
+        }
+
+        if (reverseModeValue == 1f && overallVelocity < 0.1f) {
+          driveModeActive = false;
+        }
 
         if(Input.GetKey(KeyCode.W) || acceleratorValue < 1f){
           // 1 = nothing, -1 = full throttle so we need to change the numbers here
@@ -441,16 +459,26 @@ void RestoreTireFriction(WheelCollider wheel) {
           if (adjustedValue < 0.01f) adjustedValue = 0.01f; // minimum throttle
           if (adjustedValue > 1f) adjustedValue = 1f; // clamp max
           
-          CancelInvoke("DecelerateCar");
-          deceleratingCar = false;
-          // Debug.Log("Accelerator Value: " + adjustedValue);
-          GoForward(adjustedValue);
+          if (driveModeActive) {
+            CancelInvoke("DecelerateCar");
+            deceleratingCar = false;
+            // Debug.Log("Accelerator Value: " + adjustedValue);
+            GoForward(adjustedValue);
+          } else {
+            CancelInvoke("DecelerateCar");
+            deceleratingCar = false;
+            // Debug.Log("Accelerator Value: " + adjustedValue);
+            GoReverse();
+          }
+          
         }
         if(Input.GetKey(KeyCode.S)){
           CancelInvoke("DecelerateCar");
           deceleratingCar = false;
           GoReverse();
         }
+
+
 
         if (steer != null) {
             AnalogSteering(steerValue);
