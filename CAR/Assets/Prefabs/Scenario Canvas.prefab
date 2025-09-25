@@ -121,9 +121,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: PoppedTireScenario, Assembly-CSharp
-        m_MethodName: RestartScenario
+      - m_Target: {fileID: 8132479970180091195}
+        m_TargetAssemblyTypeName: ScenarioCanvas, Assembly-CSharp
+        m_MethodName: RestartCurrentScene
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -282,6 +282,7 @@ GameObject:
   - component: {fileID: 2426431208166568254}
   - component: {fileID: 4373940765882195857}
   - component: {fileID: 1242440788256256776}
+  - component: {fileID: 8132479970180091195}
   m_Layer: 5
   m_Name: Scenario Canvas
   m_TagString: Untagged
@@ -373,6 +374,21 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &8132479970180091195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2471590737771301072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1985be6499bd4d04a907dbdb2950cf1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prometeoCarController: {fileID: 0}
+  deathScreenUI: {fileID: 5238480175566397927}
+  instructionUI: {fileID: 6828533937705659430}
 --- !u!1 &3599736268322318262
 GameObject:
   m_ObjectHideFlags: 0
@@ -630,9 +646,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: PoppedTireScenario, Assembly-CSharp
-        m_MethodName: ExitToScenarioSelect
+      - m_Target: {fileID: 8132479970180091195}
+        m_TargetAssemblyTypeName: ScenarioCanvas, Assembly-CSharp
+        m_MethodName: ReturnToMainMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

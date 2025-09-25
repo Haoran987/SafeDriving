@@ -26,7 +26,7 @@ public class ScenarioSelect : MonoBehaviour
 
     public void LoadHydroplaningScenario()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Hydroplaning");
+        UnityEngine.SceneManagement.SceneManager.LoadScene("New Hydroplane");
     }
 
     public void LoadHighwayScenario()

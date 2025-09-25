@@ -9,6 +9,7 @@ TagManager:
   - Death
   - NPC
   - Start_Stop
+  - Obstacle
   layers:
   - Default
   - TransparentFX

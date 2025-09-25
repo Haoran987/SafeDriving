@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
+using UnityEngine.Events;
 
 public class PrometeoCarController : MonoBehaviour
 {
@@ -26,6 +27,9 @@ public class PrometeoCarController : MonoBehaviour
     public InputActionProperty hat;       // <Joystick>/hat (optional)
     public InputActionProperty driveMode;
     public InputActionProperty reverseMode;
+
+
+    public UnityEvent OnPlayerDeath;
 
     bool driveModeActive = true;
 
@@ -463,7 +467,12 @@ void RestoreTireFriction(WheelCollider wheel) {
             CancelInvoke("DecelerateCar");
             deceleratingCar = false;
             // Debug.Log("Accelerator Value: " + adjustedValue);
-            GoForward(adjustedValue);
+            if (Input.GetKey(KeyCode.W)) {
+              // Debug.Log("Full throttle");
+              GoForward();
+            } else {
+              GoForward(adjustedValue);
+            }
           } else {
             CancelInvoke("DecelerateCar");
             deceleratingCar = false;
@@ -602,6 +611,10 @@ void RestoreTireFriction(WheelCollider wheel) {
     else if (other.CompareTag("Death"))
     {
       Debug.Log("DEAD");
+
+      // Send out a death signal
+      OnPlayerDeath.Invoke();
+
     }
     else if (other.CompareTag("Start_Stop"))
     {
@@ -619,6 +632,23 @@ void RestoreTireFriction(WheelCollider wheel) {
       } else if (other.CompareTag("Start_Stop"))
       {
         isDrivable = true;
+      }
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+      if (collision.gameObject.CompareTag("Death"))
+      {
+        Debug.Log("DEAD");
+
+        // Send out a death signal
+        OnPlayerDeath.Invoke();
+
+      }
+      else if (collision.gameObject.CompareTag("Obstacle"))
+      {
+        Debug.Log("Collided with an obstacle!");
+        // Handle collision with obstacle
       }
     }
 

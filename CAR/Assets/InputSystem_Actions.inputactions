@@ -538,17 +538,6 @@
                 },
                 {
                     "name": "",
-                    "id": "cc7f76e5-2784-4120-a26c-b5e9602e6e22",
-                    "path": "<Keyboard>/s",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Throttle/Brake",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "8c134eb1-498f-4eb7-a543-c200af367cd1",
                     "path": "<HID::Logitech G29 Driving Force Racing Wheel>/hat/left",
                     "interactions": "",
@@ -595,17 +584,6 @@
                     "name": "",
                     "id": "dafe4a9b-639e-41fc-812e-829c7646a76d",
                     "path": "<HID::Logitech G29 Driving Force Racing Wheel>/z",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Accelerate",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "40b91dfe-992d-47d5-8408-044217bdbdfc",
-                    "path": "<Keyboard>/w",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
