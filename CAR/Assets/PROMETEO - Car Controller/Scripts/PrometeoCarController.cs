@@ -450,106 +450,123 @@ void RestoreTireFriction(WheelCollider wheel) {
         }
 
       }else{
-        float steerValue = steer.action.ReadValue<float>();
-        float throttleValue = throttle.action.ReadValue<float>();
-        float brakeValue = brake.action.ReadValue<float>();
-        float acceleratorValue = accelerator.action.ReadValue<float>();
-        float driveModeValue = driveMode.action.ReadValue<float>();
-        float reverseModeValue = reverseMode.action.ReadValue<float>();
+        if (isDrivable) {
+          float steerValue = steer.action.ReadValue<float>();
+          float throttleValue = throttle.action.ReadValue<float>();
+          float brakeValue = brake.action.ReadValue<float>();
+          float acceleratorValue = accelerator.action.ReadValue<float>();
+          float driveModeValue = driveMode.action.ReadValue<float>();
+          float reverseModeValue = reverseMode.action.ReadValue<float>();
 
-        // Debug.Log($"steer={steerValue:F2}");
-        // Debug.Log($"brake={brakeValue:F2}");
+          // Debug.Log($"steer={steerValue:F2}");
+          // Debug.Log($"brake={brakeValue:F2}");
 
-        float overallVelocity = Mathf.Abs(localVelocityZ) + Mathf.Abs(localVelocityX);
+          float overallVelocity = Mathf.Abs(localVelocityZ) + Mathf.Abs(localVelocityX);
 
-        if (driveModeValue == 1f && overallVelocity < 0.1f) {
-          driveModeActive = true;
-        }
+          if (driveModeValue == 1f && overallVelocity < 0.1f) {
+            driveModeActive = true;
+          }
 
-        if (reverseModeValue == 1f && overallVelocity < 0.1f) {
-          driveModeActive = false;
-        }
+          if (reverseModeValue == 1f && overallVelocity < 0.1f) {
+            driveModeActive = false;
+          }
 
-        if(Input.GetKey(KeyCode.W) || acceleratorValue < 1f){
-          // 1 = nothing, -1 = full throttle so we need to change the numbers here
-          // 0.99 to -1 becomes 0.01 to 1
-          float adjustedValue = 1f - ((acceleratorValue + 1f) / 2f);
-          if (adjustedValue < 0.01f) adjustedValue = 0.01f; // minimum throttle
-          if (adjustedValue > 1f) adjustedValue = 1f; // clamp max
-          
-          if (driveModeActive) {
-            CancelInvoke("DecelerateCar");
-            deceleratingCar = false;
-            // Debug.Log("Accelerator Value: " + adjustedValue);
-            if (Input.GetKey(KeyCode.W)) {
-              // Debug.Log("Full throttle");
-              GoForward();
+          if(Input.GetKey(KeyCode.W) || acceleratorValue < 1f){
+            // 1 = nothing, -1 = full throttle so we need to change the numbers here
+            // 0.99 to -1 becomes 0.01 to 1
+            float adjustedValue = 1f - ((acceleratorValue + 1f) / 2f);
+            if (adjustedValue < 0.01f) adjustedValue = 0.01f; // minimum throttle
+            if (adjustedValue > 1f) adjustedValue = 1f; // clamp max
+            
+            if (driveModeActive) {
+              CancelInvoke("DecelerateCar");
+              deceleratingCar = false;
+              // Debug.Log("Accelerator Value: " + adjustedValue);
+              if (Input.GetKey(KeyCode.W)) {
+                // Debug.Log("Full throttle");
+                GoForward();
+              } else {
+                GoForward(adjustedValue);
+              }
             } else {
-              GoForward(adjustedValue);
+              CancelInvoke("DecelerateCar");
+              deceleratingCar = false;
+              // Debug.Log("Accelerator Value: " + adjustedValue);
+              GoReverse();
             }
-          } else {
+            
+          }
+          if(Input.GetKey(KeyCode.S)){
             CancelInvoke("DecelerateCar");
             deceleratingCar = false;
-            // Debug.Log("Accelerator Value: " + adjustedValue);
             GoReverse();
           }
+
+
+
+          if (steer != null) {
+              AnalogSteering(steerValue);
+          } else {
+            if(Input.GetKey(KeyCode.A)){
+              TurnLeft();
+            }
+            if(Input.GetKey(KeyCode.D)){
+              TurnRight();
+            }
+          }
+
+          if (brakeValue < 1f) {
+            float adjustedBrake = 1f - ((brakeValue + 1f) / 2f);
+            if (adjustedBrake < 0.01f) adjustedBrake = 0.01f; // minimum brake
+            if (adjustedBrake > 1f) adjustedBrake = 1f; // clamp max
+            Debug.Log("Brake Value: " + adjustedBrake);
+            Brakes(adjustedBrake);
+          } 
+          // else if (Input.GetKey(KeyCode.S)) {
+          //   Brakes(1f);
+          // } else {
+          //   Brakes(0f);
+          // }
           
-        }
-        if(Input.GetKey(KeyCode.S)){
-          CancelInvoke("DecelerateCar");
-          deceleratingCar = false;
-          GoReverse();
-        }
+          if(Input.GetKey(KeyCode.Space)){
+            CancelInvoke("DecelerateCar");
+            deceleratingCar = false;
+            Handbrake();
+          }
+          if(Input.GetKeyUp(KeyCode.Space)){
+            RecoverTraction();
+          }
+          if((!Input.GetKey(KeyCode.S) && !(Input.GetKey(KeyCode.W) || acceleratorValue < 1f))){
+            ThrottleOff();
+          }
+          if((!Input.GetKey(KeyCode.S) && !(Input.GetKey(KeyCode.W) || acceleratorValue < 1f)) && !Input.GetKey(KeyCode.Space) && !deceleratingCar){
+            InvokeRepeating("DecelerateCar", 0f, 0.1f);
+            deceleratingCar = true;
+          }
 
-
-
-        if (steer != null) {
-            AnalogSteering(steerValue);
+          if (steer != null) {
+              // do nothing, handled in AnalogSteering()
+          } else {
+            if(!Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D) && steeringAxis != 0f){
+              ResetSteeringAngle();
+            }
+          }
         } else {
-          if(Input.GetKey(KeyCode.A)){
-            TurnLeft();
+          // Stop the car completely
+          if (carRigidbody != null)
+          {
+              carRigidbody.linearVelocity = Vector3.zero;
+              carRigidbody.angularVelocity = Vector3.zero;
           }
-          if(Input.GetKey(KeyCode.D)){
-            TurnRight();
-          }
+          frontLeftCollider.brakeTorque = Mathf.Infinity;
+          frontRightCollider.brakeTorque = Mathf.Infinity;
+          rearLeftCollider.brakeTorque = Mathf.Infinity;
+          rearRightCollider.brakeTorque = Mathf.Infinity;
+
+          carRigidbody.useGravity = false; // disable gravity
         }
 
-        if (brakeValue < 1f) {
-          float adjustedBrake = 1f - ((brakeValue + 1f) / 2f);
-          if (adjustedBrake < 0.01f) adjustedBrake = 0.01f; // minimum brake
-          if (adjustedBrake > 1f) adjustedBrake = 1f; // clamp max
-          Debug.Log("Brake Value: " + adjustedBrake);
-          Brakes(adjustedBrake);
-        } 
-        // else if (Input.GetKey(KeyCode.S)) {
-        //   Brakes(1f);
-        // } else {
-        //   Brakes(0f);
-        // }
-        
-        if(Input.GetKey(KeyCode.Space)){
-          CancelInvoke("DecelerateCar");
-          deceleratingCar = false;
-          Handbrake();
-        }
-        if(Input.GetKeyUp(KeyCode.Space)){
-          RecoverTraction();
-        }
-        if((!Input.GetKey(KeyCode.S) && !(Input.GetKey(KeyCode.W) || acceleratorValue < 1f))){
-          ThrottleOff();
-        }
-        if((!Input.GetKey(KeyCode.S) && !(Input.GetKey(KeyCode.W) || acceleratorValue < 1f)) && !Input.GetKey(KeyCode.Space) && !deceleratingCar){
-          InvokeRepeating("DecelerateCar", 0f, 0.1f);
-          deceleratingCar = true;
-        }
 
-        if (steer != null) {
-            // do nothing, handled in AnalogSteering()
-        } else {
-          if(!Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D) && steeringAxis != 0f){
-            ResetSteeringAngle();
-          }
-        }
 
       }
 
