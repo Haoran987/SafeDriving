@@ -18,6 +18,19 @@ using UnityEngine.Events;
 
 public class PrometeoCarController : MonoBehaviour
 {
+  public void HandleDeath()
+{
+    // Stop the car completely
+    isDrivable = false;
+    if (carRigidbody != null)
+    {
+        carRigidbody.linearVelocity = Vector3.zero;
+        carRigidbody.angularVelocity = Vector3.zero;
+    }
+
+    Debug.Log("Player is dead, car stopped.");
+}
+
 
     [Header("Assign InputActionProperty (Value/Axes)")]
     public InputActionProperty steer;     // <Joystick>/stick/x
@@ -307,6 +320,7 @@ void RestoreTireFriction(WheelCollider wheel) {
         RRwheelFriction.asymptoteSlip = rearRightCollider.sidewaysFriction.asymptoteSlip;
         RRwheelFriction.asymptoteValue = rearRightCollider.sidewaysFriction.asymptoteValue;
         RRwheelFriction.stiffness = rearRightCollider.sidewaysFriction.stiffness;
+        OnPlayerDeath.AddListener(HandleDeath);
 
         // We save the initial pitch of the car engine sound.
         if(carEngineSound != null){

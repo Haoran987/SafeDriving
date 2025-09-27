@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Events;
 
 public class ScenarioCanvas : MonoBehaviour
 {
@@ -7,27 +6,33 @@ public class ScenarioCanvas : MonoBehaviour
     public GameObject deathScreenUI;
     public GameObject instructionUI;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        prometeoCarController.OnPlayerDeath.AddListener(ShowDeathScreen);
-    }
+        if (prometeoCarController == null)
+        {
+            prometeoCarController = FindObjectOfType<PrometeoCarController>();
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        if (prometeoCarController != null)
+        {
+            prometeoCarController.OnPlayerDeath.AddListener(ShowDeathScreen);
+        }
+        else
+        {
+            Debug.LogError("❌ No PrometeoCarController found in scene!");
+        }
     }
 
     void ShowDeathScreen()
     {
-        // Show the death screen UI
         deathScreenUI.SetActive(true);
     }
 
     public void RestartCurrentScene()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+        UnityEngine.SceneManagement.SceneManager.LoadScene(
+            UnityEngine.SceneManagement.SceneManager.GetActiveScene().name
+        );
     }
 
     public void ReturnToMainMenu()
