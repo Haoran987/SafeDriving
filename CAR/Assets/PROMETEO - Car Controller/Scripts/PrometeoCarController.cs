@@ -385,195 +385,148 @@ void RestoreTireFriction(WheelCollider wheel) {
 
     }
 
-    // Update is called once per frame
-    void Update()
+    
+  // Update is called once per frame
+  void Update()
+  {
+
+
+    //CAR DATA
+
+    // We determine the speed of the car.
+    carSpeed = (2 * Mathf.PI * frontLeftCollider.radius * frontLeftCollider.rpm * 60) / 1000;
+    // Save the local velocity of the car in the x axis. Used to know if the car is drifting.
+    localVelocityX = transform.InverseTransformDirection(carRigidbody.linearVelocity).x;
+    // Save the local velocity of the car in the z axis. Used to know if the car is going forward or backwards.
+    localVelocityZ = transform.InverseTransformDirection(carRigidbody.linearVelocity).z;
+
+    //CAR PHYSICS
+
+    /*
+    The next part is regarding to the car controller. First, it checks if the user wants to use touch controls (for
+    mobile devices) or analog input controls (WASD + Space).
+
+    The following methods are called whenever a certain key is pressed. For example, in the first 'if' we call the
+    method GoForward() if the user has pressed W.
+
+    In this part of the code we specify what the car needs to do if the user presses W (throttle), S (reverse),
+    A (turn left), D (turn right) or Space bar (handbrake).
+    */
+    
+    if (useTouchControls && touchControlsSetup)
     {
 
-
-      //CAR DATA
-
-      // We determine the speed of the car.
-      carSpeed = (2 * Mathf.PI * frontLeftCollider.radius * frontLeftCollider.rpm * 60) / 1000;
-      // Save the local velocity of the car in the x axis. Used to know if the car is drifting.
-      localVelocityX = transform.InverseTransformDirection(carRigidbody.linearVelocity).x;
-      // Save the local velocity of the car in the z axis. Used to know if the car is going forward or backwards.
-      localVelocityZ = transform.InverseTransformDirection(carRigidbody.linearVelocity).z;
-
-      //CAR PHYSICS
-
-      /*
-      The next part is regarding to the car controller. First, it checks if the user wants to use touch controls (for
-      mobile devices) or analog input controls (WASD + Space).
-
-      The following methods are called whenever a certain key is pressed. For example, in the first 'if' we call the
-      method GoForward() if the user has pressed W.
-
-      In this part of the code we specify what the car needs to do if the user presses W (throttle), S (reverse),
-      A (turn left), D (turn right) or Space bar (handbrake).
-      */
-      if (useTouchControls && touchControlsSetup){
-
-        if(throttlePTI.buttonPressed){
-          CancelInvoke("DecelerateCar");
-          deceleratingCar = false;
-          GoForward();
-        }
-        if(reversePTI.buttonPressed){
-          CancelInvoke("DecelerateCar");
-          deceleratingCar = false;
-          GoReverse();
-        }
-
-        if(turnLeftPTI.buttonPressed){
-          TurnLeft();
-        }
-        if(turnRightPTI.buttonPressed){
-          TurnRight();
-        }
-        if(handbrakePTI.buttonPressed){
-          CancelInvoke("DecelerateCar");
-          deceleratingCar = false;
-          Handbrake();
-        }
-        if(!handbrakePTI.buttonPressed){
-          RecoverTraction();
-        }
-        if((!throttlePTI.buttonPressed && !reversePTI.buttonPressed)){
-          ThrottleOff();
-        }
-        if((!reversePTI.buttonPressed && !throttlePTI.buttonPressed) && !handbrakePTI.buttonPressed && !deceleratingCar){
-          InvokeRepeating("DecelerateCar", 0f, 0.1f);
-          deceleratingCar = true;
-        }
-        if(!turnLeftPTI.buttonPressed && !turnRightPTI.buttonPressed && steeringAxis != 0f){
-          ResetSteeringAngle();
-        }
-
-      }else{
-        if (isDrivable) {
-          float steerValue = steer.action.ReadValue<float>();
-          float throttleValue = throttle.action.ReadValue<float>();
-          float brakeValue = brake.action.ReadValue<float>();
-          float acceleratorValue = accelerator.action.ReadValue<float>();
-          float driveModeValue = driveMode.action.ReadValue<float>();
-          float reverseModeValue = reverseMode.action.ReadValue<float>();
-
-          // Debug.Log($"steer={steerValue:F2}");
-          // Debug.Log($"brake={brakeValue:F2}");
-
-          float overallVelocity = Mathf.Abs(localVelocityZ) + Mathf.Abs(localVelocityX);
-
-          if (driveModeValue == 1f && overallVelocity < 0.1f) {
-            driveModeActive = true;
-          }
-
-          if (reverseModeValue == 1f && overallVelocity < 0.1f) {
-            driveModeActive = false;
-          }
-
-          if(Input.GetKey(KeyCode.W) || acceleratorValue < 1f){
-            // 1 = nothing, -1 = full throttle so we need to change the numbers here
-            // 0.99 to -1 becomes 0.01 to 1
-            float adjustedValue = 1f - ((acceleratorValue + 1f) / 2f);
-            if (adjustedValue < 0.01f) adjustedValue = 0.01f; // minimum throttle
-            if (adjustedValue > 1f) adjustedValue = 1f; // clamp max
-            
-            if (driveModeActive) {
-              CancelInvoke("DecelerateCar");
-              deceleratingCar = false;
-              // Debug.Log("Accelerator Value: " + adjustedValue);
-              if (Input.GetKey(KeyCode.W)) {
-                // Debug.Log("Full throttle");
-                GoForward();
-              } else {
-                GoForward(adjustedValue);
-              }
-            } else {
-              CancelInvoke("DecelerateCar");
-              deceleratingCar = false;
-              // Debug.Log("Accelerator Value: " + adjustedValue);
-              GoReverse();
-            }
-            
-          }
-          if(Input.GetKey(KeyCode.S)){
-            CancelInvoke("DecelerateCar");
-            deceleratingCar = false;
-            GoReverse();
-          }
-
-
-
-          if (steer != null) {
-              AnalogSteering(steerValue);
-          } else {
-            if(Input.GetKey(KeyCode.A)){
-              TurnLeft();
-            }
-            if(Input.GetKey(KeyCode.D)){
-              TurnRight();
-            }
-          }
-
-          if (brakeValue < 1f) {
-            float adjustedBrake = 1f - ((brakeValue + 1f) / 2f);
-            if (adjustedBrake < 0.01f) adjustedBrake = 0.01f; // minimum brake
-            if (adjustedBrake > 1f) adjustedBrake = 1f; // clamp max
-            Debug.Log("Brake Value: " + adjustedBrake);
-            Brakes(adjustedBrake);
-          } 
-          // else if (Input.GetKey(KeyCode.S)) {
-          //   Brakes(1f);
-          // } else {
-          //   Brakes(0f);
-          // }
-          
-          if(Input.GetKey(KeyCode.Space)){
-            CancelInvoke("DecelerateCar");
-            deceleratingCar = false;
-            Handbrake();
-          }
-          if(Input.GetKeyUp(KeyCode.Space)){
-            RecoverTraction();
-          }
-          if((!Input.GetKey(KeyCode.S) && !(Input.GetKey(KeyCode.W) || acceleratorValue < 1f))){
-            ThrottleOff();
-          }
-          if((!Input.GetKey(KeyCode.S) && !(Input.GetKey(KeyCode.W) || acceleratorValue < 1f)) && !Input.GetKey(KeyCode.Space) && !deceleratingCar){
-            InvokeRepeating("DecelerateCar", 0f, 0.1f);
-            deceleratingCar = true;
-          }
-
-          if (steer != null) {
-              // do nothing, handled in AnalogSteering()
-          } else {
-            if(!Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D) && steeringAxis != 0f){
-              ResetSteeringAngle();
-            }
-          }
-        } else {
-          // Stop the car completely
-          if (carRigidbody != null)
-          {
-              carRigidbody.linearVelocity = Vector3.zero;
-              carRigidbody.angularVelocity = Vector3.zero;
-          }
-          frontLeftCollider.brakeTorque = Mathf.Infinity;
-          frontRightCollider.brakeTorque = Mathf.Infinity;
-          rearLeftCollider.brakeTorque = Mathf.Infinity;
-          rearRightCollider.brakeTorque = Mathf.Infinity;
-
-          carRigidbody.useGravity = false; // disable gravity
-        }
-
-
-
+      if (throttlePTI.buttonPressed)
+      {
+        CancelInvoke("DecelerateCar");
+        deceleratingCar = false;
+        GoForward();
+      }
+      if (reversePTI.buttonPressed)
+      {
+        CancelInvoke("DecelerateCar");
+        deceleratingCar = false;
+        GoReverse();
       }
 
+      if (turnLeftPTI.buttonPressed)
+      {
+        TurnLeft();
+      }
+      if (turnRightPTI.buttonPressed)
+      {
+        TurnRight();
+      }
+      if (handbrakePTI.buttonPressed)
+      {
+        CancelInvoke("DecelerateCar");
+        deceleratingCar = false;
+        Handbrake();
+      }
+      if (!handbrakePTI.buttonPressed)
+      {
+        RecoverTraction();
+      }
+      if ((!throttlePTI.buttonPressed && !reversePTI.buttonPressed))
+      {
+        ThrottleOff();
+      }
+      if ((!reversePTI.buttonPressed && !throttlePTI.buttonPressed) && !handbrakePTI.buttonPressed && !deceleratingCar)
+      {
+        InvokeRepeating("DecelerateCar", 0f, 0.1f);
+        deceleratingCar = true;
+      }
+      if (!turnLeftPTI.buttonPressed && !turnRightPTI.buttonPressed && steeringAxis != 0f)
+      {
+        ResetSteeringAngle();
+      }
 
-      // We call the method AnimateWheelMeshes() in order to match the wheel collider movements with the 3D meshes of the wheels.
-      AnimateWheelMeshes();
+    }
+    else
+    {
+      if (isDrivable)
+{
+    float throttleInput = GetThrottleInput();
+    float brakeInput    = GetBrakeInput();
+    float reverseInput  = GetReverseInput();
+    float steerInput    = GetSteerInput();
 
+    // Forward
+    if (throttleInput > 0f && driveModeActive)
+    {
+        CancelInvoke("DecelerateCar");
+        deceleratingCar = false;
+        GoForward(throttleInput);
+    }
+
+    // Reverse
+    if (reverseInput > 0f && !driveModeActive)
+    {
+        CancelInvoke("DecelerateCar");
+        deceleratingCar = false;
+        GoReverse();
+    }
+
+    // Steering
+    AnalogSteering(steerInput);
+
+    // Brakes
+    if (brakeInput > 0f)
+    {
+        CancelInvoke("DecelerateCar");
+        deceleratingCar = false;
+        Brakes(brakeInput);
+    }
+
+    // Handbrake
+    if (Input.GetKey(KeyCode.Space))
+    {
+        CancelInvoke("DecelerateCar");
+        deceleratingCar = false;
+        Handbrake();
+    }
+    else if (Input.GetKeyUp(KeyCode.Space))
+    {
+        RecoverTraction();
+    }
+
+    // Throttle off → decelerate
+    if (throttleInput == 0f && reverseInput == 0f && brakeInput == 0f && !deceleratingCar)
+    {
+        InvokeRepeating("DecelerateCar", 0f, 0.1f);
+        deceleratingCar = true;
+    }
+}
+
+
+
+
+    }
+
+
+    // We call the method AnimateWheelMeshes() in order to match the wheel collider movements with the 3D meshes of the wheels.
+    AnimateWheelMeshes();
+      
     }
 
   void FixedUpdate()
@@ -1115,5 +1068,47 @@ ResetSteeringAngle();
         driftingAxis = 0f;
       }
     }
+float GetThrottleInput()
+{
+    // Steering wheel / pedal
+    float inputSystemValue = (throttle.action != null) ? throttle.action.ReadValue<float>() : 0f;
+
+    // Keyboard W
+    float keyboardValue = Input.GetKey(KeyCode.W) ? 1f : 0f;
+
+    return Mathf.Max(inputSystemValue, keyboardValue);
+}
+
+float GetBrakeInput()
+{
+    float inputSystemValue = (brake.action != null) ? brake.action.ReadValue<float>() : 0f;
+
+    // Keyboard S as brake
+    float keyboardValue = Input.GetKey(KeyCode.S) ? 1f : 0f;
+
+    return Mathf.Max(inputSystemValue, keyboardValue);
+}
+
+float GetReverseInput()
+{
+    float inputSystemValue = (reverseMode.action != null) ? reverseMode.action.ReadValue<float>() : 0f;
+
+    // Keyboard S as reverse
+    float keyboardValue = Input.GetKey(KeyCode.S) ? 1f : 0f;
+
+    return Mathf.Max(inputSystemValue, keyboardValue);
+}
+
+float GetSteerInput()
+{
+    float inputSystemValue = (steer.action != null) ? steer.action.ReadValue<float>() : 0f;
+
+    float keyboardValue = 0f;
+    if (Input.GetKey(KeyCode.A)) keyboardValue = -1f;
+    if (Input.GetKey(KeyCode.D)) keyboardValue =  1f;
+
+    // Combine input system + keyboard, clamp to valid range
+    return Mathf.Clamp(inputSystemValue + keyboardValue, -1f, 1f);
+}
 
 }
