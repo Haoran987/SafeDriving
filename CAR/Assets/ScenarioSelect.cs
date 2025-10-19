@@ -1,41 +1,43 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ScenarioSelect : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
+    // Loads the popped tire driving scenario
     public void LoadPoppedTireScenario()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Popped Tire");
+        SceneManager.LoadScene("Popped Tire");
     }
 
+    // Loads the T-Bone driving scenario
     public void LoadTBoneScenario()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("T-Bone");
+        SceneManager.LoadScene("T-Bone");
     }
 
+    // Loads the hydroplaning driving scenario
     public void LoadHydroplaningScenario()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("New Hydroplane");
+        SceneManager.LoadScene("New Hydroplane");
     }
 
+    // Loads the highway driving scenario
     public void LoadHighwayScenario()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Highway");
+        SceneManager.LoadScene("Highway");
     }
 
+    // Loads the tutorial / guide scene for hydroplaning
+    public void LoadHydrGuideScene()
+    {
+        Debug.Log("Loading Hydroguide...");
+    SceneManager.LoadScene("Hydroguide");
+        SceneManager.LoadScene("Hydroguide");
+    }
+
+    // Returns to the title screen
     public void BackToTitleScreen()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Title Screen");
+        SceneManager.LoadScene("Title Screen");
     }
 }
