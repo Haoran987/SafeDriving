@@ -525,7 +525,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prometeoCarController: {fileID: 0}
   deathScreenUI: {fileID: 5238480175566397927}
-  passUI: {fileID: 0}
+  passUI: {fileID: 4370338408620395700}
   instructionUI: {fileID: 6828533937705659430}
 --- !u!1 &3404341990760394993
 GameObject:

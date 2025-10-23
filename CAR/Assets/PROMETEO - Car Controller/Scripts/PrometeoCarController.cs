@@ -521,7 +521,7 @@ void RestoreTireFriction(WheelCollider wheel) {
             float adjustedBrake = 1f - ((brakeValue + 1f) / 2f);
             if (adjustedBrake < 0.01f) adjustedBrake = 0.01f; // minimum brake
             if (adjustedBrake > 1f) adjustedBrake = 1f; // clamp max
-            Debug.Log("Brake Value: " + adjustedBrake);
+            // Debug.Log("Brake Value: " + adjustedBrake);
             Brakes(adjustedBrake);
           } 
           // else if (Input.GetKey(KeyCode.S)) {
@@ -845,7 +845,7 @@ ResetSteeringAngle();
 
     // This method apply positive torque to the wheels in order to go forward.
     public void GoForward(float analogValue = 1f){
-      Debug.Log("Analog Value: " + analogValue);
+      // Debug.Log("Analog Value: " + analogValue);
       //If the forces aplied to the rigidbody in the 'x' asis are greater than
       //3f, it means that the car is losing traction, then the car will start emitting particle systems.
       if(Mathf.Abs(localVelocityX) > 2.5f){
@@ -867,8 +867,8 @@ ResetSteeringAngle();
         Brakes();
       }else{
         if(Mathf.RoundToInt(carSpeed) < maxSpeed){
-          Debug.Log("Accelerator Value: " + analogValue);
-          Debug.Log($"{(accelerationMultiplier * analogValue * 50f) * throttleAxis}");
+          // Debug.Log("Accelerator Value: " + analogValue);
+          // Debug.Log($"{(accelerationMultiplier * analogValue * 50f) * throttleAxis}");
           //Apply positive torque in all wheels to go forward if maxSpeed has not been reached.
           frontLeftCollider.brakeTorque = 0;
           frontLeftCollider.motorTorque = (accelerationMultiplier * analogValue * 50f) * throttleAxis;

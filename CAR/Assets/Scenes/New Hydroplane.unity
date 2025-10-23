@@ -2495,7 +2495,7 @@ GameObject:
   - component: {fileID: 109058095}
   m_Layer: 0
   m_Name: PassZone
-  m_TagString: Death
+  m_TagString: pass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2519,8 +2519,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 2.5380266, y: 1.7974716, z: 0.14564013}
+  m_Center: {x: -0.48740724, y: -1.6663189, z: -0.4271809}
 --- !u!23 &109058096
 MeshRenderer:
   m_ObjectHideFlags: 0
