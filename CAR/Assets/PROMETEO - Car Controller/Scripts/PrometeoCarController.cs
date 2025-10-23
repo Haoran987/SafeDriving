@@ -42,7 +42,8 @@ public class PrometeoCarController : MonoBehaviour
     public InputActionProperty reverseMode;
 
 
-    public UnityEvent OnPlayerDeath;
+  public UnityEvent OnPlayerDeath;
+  public UnityEvent OnPlayerPass;
 
     bool driveModeActive = true;
 
@@ -320,7 +321,8 @@ void RestoreTireFriction(WheelCollider wheel) {
         RRwheelFriction.asymptoteSlip = rearRightCollider.sidewaysFriction.asymptoteSlip;
         RRwheelFriction.asymptoteValue = rearRightCollider.sidewaysFriction.asymptoteValue;
         RRwheelFriction.stiffness = rearRightCollider.sidewaysFriction.stiffness;
-        OnPlayerDeath.AddListener(HandleDeath);
+    OnPlayerDeath.AddListener(HandleDeath);
+    OnPlayerPass.AddListener(HandleDeath);
 
         // We save the initial pitch of the car engine sound.
         if(carEngineSound != null){
@@ -650,6 +652,10 @@ void RestoreTireFriction(WheelCollider wheel) {
     else if (other.CompareTag("Start_Stop"))
     {
       isDrivable = false;
+    }
+    else if (other.CompareTag("pass"))
+    {
+      OnPlayerPass.Invoke();
     }
     }
 

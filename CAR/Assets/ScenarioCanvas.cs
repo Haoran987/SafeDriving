@@ -4,6 +4,7 @@ public class ScenarioCanvas : MonoBehaviour
 {
     public PrometeoCarController prometeoCarController;
     public GameObject deathScreenUI;
+    public GameObject passUI;
     public GameObject instructionUI;
 
     void Start()
@@ -16,7 +17,10 @@ public class ScenarioCanvas : MonoBehaviour
         if (prometeoCarController != null)
         {
             prometeoCarController.OnPlayerDeath.AddListener(ShowDeathScreen);
+            prometeoCarController.OnPlayerPass.AddListener(Showps);
+
         }
+
         else
         {
             Debug.LogError("❌ No PrometeoCarController found in scene!");
@@ -26,6 +30,10 @@ public class ScenarioCanvas : MonoBehaviour
     void ShowDeathScreen()
     {
         deathScreenUI.SetActive(true);
+    }
+    void Showps()
+    {
+        passUI.SetActive(true);
     }
 
     public void RestartCurrentScene()
