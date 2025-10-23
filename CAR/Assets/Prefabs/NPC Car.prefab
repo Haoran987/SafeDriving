@@ -5793,6 +5793,96 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0fefceefe666bb4682b272ec8c5bdd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  steer:
+    m_UseReference: 0
+    m_Action:
+      m_Name: Steer
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: e96689a5-cde1-4d09-8db1-9b44a97800b6
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    m_Reference: {fileID: 0}
+  throttle:
+    m_UseReference: 0
+    m_Action:
+      m_Name: Throttle
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: 52282f0c-b5b4-427a-b47d-9253311700c2
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    m_Reference: {fileID: 0}
+  brake:
+    m_UseReference: 0
+    m_Action:
+      m_Name: Brake
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: 46a5beff-c1bb-44f1-9887-944dbf2d0020
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    m_Reference: {fileID: 0}
+  accelerator:
+    m_UseReference: 0
+    m_Action:
+      m_Name: Accelerator
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: b6a1e791-709c-49a0-8602-317017e1ce7e
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    m_Reference: {fileID: 0}
+  hat:
+    m_UseReference: 0
+    m_Action:
+      m_Name: Hat
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: 1c7aa879-ff23-4552-b0a7-dd2358834f61
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    m_Reference: {fileID: 0}
+  driveMode:
+    m_UseReference: 0
+    m_Action:
+      m_Name: Drive Mode
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: c4a468ce-b9e6-4915-a1b1-11f89f3bf049
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    m_Reference: {fileID: 0}
+  reverseMode:
+    m_UseReference: 0
+    m_Action:
+      m_Name: Reverse Mode
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: 5c6007c8-67a0-44fb-9e18-735813c789f8
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    m_Reference: {fileID: 0}
+  OnPlayerDeath:
+    m_PersistentCalls:
+      m_Calls: []
+  OnPlayerPass:
+    m_PersistentCalls:
+      m_Calls: []
   maxSpeed: 120
   maxReverseSpeed: 45
   accelerationMultiplier: 6
@@ -5846,11 +5936,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71c5c6c0e4b1f4fabb598d751f80d34f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  npcType: 0
+  initialSpeed: 50
   speed: 50
   frontLeftCollider: {fileID: 5654662289203588423}
   frontRightCollider: {fileID: 2881833605240283763}
   rearLeftCollider: {fileID: 3240486774208973963}
   rearRightCollider: {fileID: 4397935096356620531}
+  playerCar: {fileID: 0}
 --- !u!1 &7550235862555934571
 GameObject:
   m_ObjectHideFlags: 0
