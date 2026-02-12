@@ -14,10 +14,10 @@ public class Analysis : MonoBehaviour
     {
         _envLoader = new EnvLoader();
         // Load env vars from StreamingAssets/.env
-        EnvLoader.LoadOnce();
+        _envLoader.LoadOnce();
 
-        var key = EnvLoader.Require("OPENAI_API_KEY");
-        var model = EnvLoader.Get("OPENAI_MODEL", "gpt-4.1-mini");
+        var key = _envLoader.Require("OPENAI_API_KEY");
+        var model = _envLoader.Get("OPENAI_MODEL", "gpt-4.1-mini");
 
         _client = new OpenAI(key, model);
     }
