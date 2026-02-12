@@ -1,15 +1,41 @@
 using UnityEngine;
 using TMPro;
+using EnvLoad;
 
 public class Analysis : MonoBehaviour
 {
     public TextMeshProUGUI statusText;
     public TextMeshProUGUI analysisText;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private OpenAI _client;
+    private EnvLoader _envLoader;
+
+    private void Awake()
     {
-        
+        _envLoader = new EnvLoader();
+        // Load env vars from StreamingAssets/.env
+        EnvLoader.LoadOnce();
+
+        var key = EnvLoader.Require("OPENAI_API_KEY");
+        var model = EnvLoader.Get("OPENAI_MODEL", "gpt-4.1-mini");
+
+        _client = new OpenAI(key, model);
+    }
+
+    private void Start()
+    {
+        StartCoroutine(_client.CreateResponse(
+            "Looking at this data, please name 3 suggestions for what I can do to drive safer.",
+            onSuccess: (rawJson) =>
+            {
+                Debug.Log("RAW JSON:\n" + rawJson);
+
+                var text = OpenAI.TryExtractOutputText(rawJson);
+                if (!string.IsNullOrEmpty(text))
+                    Debug.Log("OUTPUT TEXT:\n" + text);
+            },
+            onError: (err) => Debug.LogError(err)
+        ));
     }
 
     // Update is called once per frame
